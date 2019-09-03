@@ -40,6 +40,7 @@ The variables in use are:
 Name         | Description
 ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 SLACK_TOKEN  | Slack API token, generated when you created the bot integration on Slack.  This value is required.
+CLIENT_SIGNING_SECRET | Signing Secret from Basic Information page of your App in Slack.  This value is required.
 DATABASE_URL | The Postgres connection URL for your standup-bot database.  Defaults to `postgres://localhost/standup`.  The specified database must already exist, but it can be empty.
 PORT         | The port for the built-in webserver to run on.  This server hosts the bot's API and documentation.  If omitted, the built-in webserver will not run.  If you don't want the webserver, just leave `PORT` out.
 TIMEZONE     | The timezone for the bot to use, or defaults to `America/New_York`.  Timezone names must be [supported by moment-timezone](http://momentjs.com/timezone/docs/#/data-loading/getting-zone-names/).
