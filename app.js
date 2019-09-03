@@ -53,6 +53,7 @@ function bkLog(level) {
 }
 
 var controller = Botkit.slackbot({
+  clientSigningSecret: process.env.CLIENT_SIGNING_SECRET,
   debug: false,
   logger: { log: bkLog },
   webserver: {
