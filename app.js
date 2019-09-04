@@ -123,6 +123,9 @@ controller.spawn({
       // Respond to all other direct messages
       botLib.unhandledDM(controller);
 
+      // show link to most recent standup thread
+      botLib.showLatestStandup(controller);
+
       log.verbose('All bot functions initialized');
     });
 

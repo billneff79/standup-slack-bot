@@ -51,6 +51,7 @@ All of the following commands can only be invoked by mentioning the standup bot 
 * *Direct Message* - Submit standup info. See the [`Submitting your standup`](#submitting-your-standup) section above for details
 * `report [channel] [user] [days]` - Valid in channel or direct mention.  Show the user-specific standup report for today for the current channel for the current user by default.  If a different channel or user mention is supplied, those will be used instead.   e.g. `report` (today, current channel, current user), `report 2` (today and yesterday, current channel, current user), `report #testroom @userA 3` (past 3 days for in testroom for userA),...
 * `ooo (days)` - Specify that the user will be out of the office for the specified number of calendar days (not business days or standup-only days).  e.g. `ooo for 7 days` (out for the next week), `out of the office 5` (our for next 5 calendar days)
+* `(where|show|latest)` - Provide a link to the most recent standup thread.  e.g. `where is the most recent standup?`, `show the latest standup`, or simply `latest`.
 
 
 ### Scheduling Related
