@@ -9,13 +9,13 @@ module.exports = function() {
 	let _channelFindOrCreateStub = null;
 
 	this.Given('I am in a private room with the bot', () => {
-		botLib.createStandup(common.botController);
+		botLib.createStandup(common.botController, common.rtmBot);
 		_message.channel = 'PnutButterJellyTime';
 	});
 
 	this.When(/I say "@bot ((create|schedule) (standup .*))"/,
 		(message, triggerWord, rest, done) => {
-			botLib.createStandup(common.botController);
+			botLib.createStandup(common.botController, common.rtmBot);
 
 			_message.type = 'message';
 			_message.text = message;

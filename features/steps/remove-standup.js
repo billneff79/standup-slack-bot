@@ -10,7 +10,7 @@ module.exports = function() {
 
 	this.When(/I say "@bot ((remove|delete) (standup))"/,
 		(message, triggerWord, rest, done) => {
-			botLib.removeStandup(common.botController);
+			botLib.removeStandup(common.botController, common.rtmBot);
 
 			_message.type = 'message';
 			_message.text = message;

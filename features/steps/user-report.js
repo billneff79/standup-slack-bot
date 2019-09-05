@@ -6,7 +6,7 @@ module.exports = function () {
 	let _message = { };
 
 	this.When(/I say "@bot ((report) (.*))"/, (message, triggerWord, rest, done) => {
-		botLib.userReport(common.botController);
+		botLib.userReport(common.botController, common.rtmBot);
 
 		_message.type = 'message';
 		_message.text = message;

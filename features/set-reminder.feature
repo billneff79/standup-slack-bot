@@ -5,7 +5,7 @@ Feature: Set standup meeting reminders
     And I am in a room with the bot
     And the standup is scheduled for <utc-time>
     When I say "@bot reminder <time>"
-    Then the bot should respond "Got it."
+    Then the bot should respond "Reminder set"
 
     Examples:
       | utc-time | time | result  |

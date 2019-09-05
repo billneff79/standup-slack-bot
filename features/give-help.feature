@@ -4,10 +4,16 @@ Feature: Get usage help
     Given the bot is running
     And I am in a room with the bot
     When I say "@bot help"
-    Then the bot should upload a post
+    Then the bot should privately respond "Check out my"
+
+	Scenario: I ask for help in a channel with a slash command
+    Given the bot is running
+    And I am in a room with the bot
+    When I say "/standup help"
+    Then the webhook bot should privately respond "Check out my"
 
   Scenario: I ask for help in a DM
     Given the bot is running
     And I am in a room with the bot
     When I DM the bot with "help"
-    Then the bot should upload a post
+    Then the bot should privately respond "Check out my"

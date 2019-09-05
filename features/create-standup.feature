@@ -8,7 +8,7 @@ Feature: Create standup meetings on a recurring basis
 
     Examples:
       | time | response-start                                |
-      | 0830 | Got it                                        |
+      | 0830 | Standup scheduled                             |
       | 130  | :x: Sorry, I couldn't understand that message |
 
   Scenario Outline: I try to create a standup

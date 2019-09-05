@@ -39,9 +39,16 @@ module.exports = function() {
 			}
 		};
 
+		let webhookBot = {
+			replyAcknowledge: sinon.spy(),
+			replyPublicDelayed: sinon.spy(),
+			replyPrivateDelayed: sinon.spy()
+		};
+
 		module.exports.rtmBot = bot;
 
 		module.exports.botController.hears.__bot = bot;
+		module.exports.botController.hears.__webhookBot = webhookBot;
 		module.exports.botController.on.__bot = bot;
 	});
 
@@ -54,8 +61,12 @@ module.exports = function() {
 		return (!bot.reply.called && !bot.say.called && !bot.startPrivateConversation.called);
 	});
 
-	this.Then(/the bot should respond "([^"]+)"/, (responseContains) => {
-		let botReply = module.exports.botController.hears.__bot.reply.args[0][1];
+	this.Then(/the (webhook )?bot should (privately )?respond "([^"]+)"/, (isWebhook, isPrivate, responseContains) => {
+		let responseBot = module.exports.botController.hears[isWebhook ? '__webhookBot' : '__bot'];
+		let responseMethod = isWebhook ?
+			isPrivate ? 'replyPrivateDelayed' : 'replyPublicDelayed'
+			: isPrivate ? 'whisper' : 'reply';
+		let botReply = responseBot[responseMethod].args[0][1];
 
 		if (typeof botReply === 'object' && (botReply.text || botReply.attachments[0].fallback)) {
 			botReply = botReply.text || botReply.attachments[0].fallback;

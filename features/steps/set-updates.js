@@ -7,7 +7,7 @@ module.exports = function() {
 
 	this.When(/I say "@bot ((.*)?(en|dis)able updates)"/,
 		(message, maybeStuffBefore, enOrDis, done) => {
-			botLib.setInChannelUpdate(common.botController);
+			botLib.setInChannelUpdate(common.botController, common.rtmBot);
 
 			_message.type = 'message';
 			_message.text = message;

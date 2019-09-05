@@ -11,7 +11,7 @@ module.exports = function() {
 
 	this.When(/I say "@bot ((reminder) (.*))"/,
 		(message, triggerWord, rest, done) => {
-			botLib.setReminder(common.botController);
+			botLib.setReminder(common.botController, common.rtmBot);
 
 			_message.type = 'message';
 			_message.text = message;
