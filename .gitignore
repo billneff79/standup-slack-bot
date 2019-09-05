@@ -4,3 +4,4 @@ coverage
 cf-ssh.yml
 npm-debug.log
 .env
+.data/

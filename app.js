@@ -53,7 +53,7 @@ function bkLog(level) {
 }
 
 var controller = Botkit.slackbot({
-  clientSigningSecret: process.env.CLIENT_SIGNING_SECRET,
+  json_file_store: __dirname + '/.data/db',
   debug: false,
   logger: { log: bkLog },
   webserver: {
@@ -71,6 +71,10 @@ controller.spawn({
     throw new Error(err);
   } else {
     log.info('Connected to RTM');
+
+    //persist the team info so webhooks can be verified later on
+    controller.storage.teams.save(bot.team_info);
+
     bot.identifyBot(function(err,identity) {
       // identity contains...
       // {name, id, team_id}
@@ -82,14 +86,14 @@ controller.spawn({
 
       // TODO: method to set standup frequency
       // TODO: add usage messages
-      botLib.giveHelp(controller, identity.name);
+      botLib.giveHelp(controller, identity.name, bot);
 
       // Set yourself OOO for some time.  Put this above getStandupInfo
       // because getStandupInfo catches anything that starts with "#channel",
       // so catch the more precise
       botLib.setOutOfOffice(controller);
 
-      botLib.getStandupInfo(controller);
+      botLib.getStandupInfo(controller, bot);
 
       // TODO: remind people to do standup?
       botLib.setReminder(controller);
@@ -105,7 +109,7 @@ controller.spawn({
 
       // DM a user when they ask to be interviewed or
       // they react to a reminder DM
-      botLib.startInterview(controller);
+      botLib.startInterview(controller, bot);
       botLib.startDmEmoji(controller, identity.id);
 
       // Remove a standup
@@ -124,7 +128,7 @@ controller.spawn({
       botLib.unhandledDM(controller);
 
       // show link to most recent standup thread
-      botLib.showLatestStandup(controller);
+      botLib.showLatestStandup(controller, bot);
 
       log.verbose('All bot functions initialized');
     });
