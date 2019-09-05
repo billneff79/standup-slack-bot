@@ -49,6 +49,7 @@ function bkLog(level, ...restArgs) {
 
 let controller = Botkit.slackbot({
 	json_file_store: __dirname + '/.data/db',
+	clientSigningSecret: process.env.CLIENT_SIGNING_SECRET,
 	debug: false,
 	logger: { log: bkLog },
 	webserver: {
@@ -68,13 +69,16 @@ controller.spawn({
 	else {
 		log.info('Connected to RTM');
 
-		//persist the team info so webhooks can be verified later on
-		controller.storage.teams.save(bot.team_info);
-
 		bot.identifyBot((err,identity) => {
 			// identity contains...
 			// {name, id, team_id}
 			log.info('Bot name: ' + identity.name);
+
+			//persist the team info so webhooks can be verified later on
+			controller.storage.teams.save({
+				...bot.team_info,
+				bot: identity
+			});
 
 			// Set up cron job to check every minute for channels that need a standup report
 			schedule.scheduleJob('* * * * 1-5', botLib.getReportRunner(bot));

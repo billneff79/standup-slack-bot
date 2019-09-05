@@ -12,8 +12,8 @@ function noop() { return Promise.resolve(); }
 // Default all used methods to no-ops that resolve
 // an empty promise.  Tests that rely on other
 // behavior should stub these methods individually.
-mockRequire('sequelize', () => ({
-	import(filepath) {
+mockRequire('sequelize', function () {
+	this.import = function(filepath) {
 		return {
 			name: path.basename(filepath),
 			findOrCreate: noop,
@@ -23,5 +23,5 @@ mockRequire('sequelize', () => ({
 			upsert: noop,
 			destroy: noop
 		};
-	}
-}));
+	};
+});

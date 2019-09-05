@@ -5,7 +5,7 @@ let db = {};
 
 let conString = process.env.DATABASE_URL || 'postgres://localhost/standup';
 
-let sequelize = Sequelize(conString, { //eslint-disable-line new-cap
+let sequelize = new Sequelize(conString, {
 	logging: false
 });
 let models = ['Channel','Standup'];
