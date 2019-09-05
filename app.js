@@ -86,23 +86,23 @@ controller.spawn({
 
 			// TODO: method to set standup frequency
 			// TODO: add usage messages
-			botLib.giveHelp(controller, identity.name, bot);
+			botLib.giveHelp(controller, bot);
 
 			// Set yourself OOO for some time.  Put this above getStandupInfo
 			// because getStandupInfo catches anything that starts with "#channel",
 			// so catch the more precise
-			botLib.setOutOfOffice(controller);
+			botLib.setOutOfOffice(controller, bot);
 
 			botLib.getStandupInfo(controller, bot);
 
 			// TODO: remind people to do standup?
-			botLib.setReminder(controller);
+			botLib.setReminder(controller, bot);
 
 			// Message for when the bot is added to a channel
 			botLib.joinChannel(controller, identity.name);
 
 			// Create a standup in a channel
-			botLib.createStandup(controller);
+			botLib.createStandup(controller, bot);
 
 			// Add or change a standup message for today in a DM with the bot
 			botLib.getUserStandupInfo(controller);
@@ -113,19 +113,19 @@ controller.spawn({
 			botLib.startDmEmoji(controller, identity.id);
 
 			// Remove a standup
-			botLib.removeStandup(controller);
+			botLib.removeStandup(controller, bot);
 
 			// Set a standup audience to a user group
-			botLib.setAudience(controller);
+			botLib.setAudience(controller, bot);
 
 			// Configure in-channel updates
-			botLib.setInChannelUpdate(controller);
+			botLib.setInChannelUpdate(controller, bot);
 
 			// Get a weekly user report
-			botLib.userReport(controller);
+			botLib.userReport(controller, bot);
 
 			// Respond to all other direct messages
-			botLib.unhandledDM(controller);
+			botLib.unhandledDM(controller, bot);
 
 			// show link to most recent standup thread
 			botLib.showLatestStandup(controller, bot);
