@@ -1,23 +1,23 @@
-'use strict';
 
-var Sequelize = require('sequelize');
-var db = {};
 
-var conString = process.env.DATABASE_URL || 'postgres://localhost/standup';
+let Sequelize = require('sequelize');
+let db = {};
 
-var sequelize = new Sequelize(conString, {
-    logging: false,
+let conString = process.env.DATABASE_URL || 'postgres://localhost/standup';
+
+let sequelize = Sequelize(conString, { //eslint-disable-line new-cap
+	logging: false
 });
-var models = ['Channel','Standup'];
-models.forEach(function(file) {
-    var model = sequelize.import(__dirname + '/' + file);
-    db[model.name] = model;
+let models = ['Channel','Standup'];
+models.forEach((file) => {
+	let model = sequelize.import(__dirname + '/' + file);
+	db[model.name] = model;
 });
 
-Object.keys(db).forEach(function(modelName) {
-    if ('associate' in db[modelName]) {
-        db[modelName].associate(db);
-    }
+Object.keys(db).forEach((modelName) => {
+	if ('associate' in db[modelName]) {
+		db[modelName].associate(db);
+	}
 });
 
 db.sequelize = sequelize;
