@@ -6,7 +6,7 @@ The bot will automatically report into a channel at the specified time on weekda
 
 You can also request reports at any time.  To get today's report for a channel to run again, in that channel, say:
 
-`@standup-bot report`
+`@{{bot_name}} report`
 
 For finer-grained reporting, you can send a DM to the bot.  With this method, you must specify a channel and optionally a user (default is yourself) and number of days (default is one week) to report.  For example:
 

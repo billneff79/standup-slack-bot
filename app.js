@@ -131,8 +131,9 @@ controller.spawn({
 			botLib.showLatestStandup(controller, bot);
 
 			log.verbose('All bot functions initialized');
+
+			startWebServer(controller, identity.name);
 		});
 
-		startWebServer(controller);
 	}
 });
