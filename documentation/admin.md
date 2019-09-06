@@ -16,7 +16,6 @@ Additionally, you can schedule the standups for just certain days of the week:
 
 Some things to note:
 
-- The standup bot can only work in public channels
 - All times are assumed to be in Eastern time
 - The time indicates what time the bot will report
 - Days of the week are accepted as:
