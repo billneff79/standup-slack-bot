@@ -54,6 +54,8 @@ or
 
 To have `@user1 @user2 @user` mentioned in the reminder messages instead of `@here`.  Any mention is valid, including user mentions, `@here` and `@channel`.
 
+Alternate words instead of `audience` are `usergroup`, `alert`, and `notify`.
+
 ## Enabling in-channel updates
 
 When new reports come in after the bot has posted the daily reports, by default the bot doesn't notify anyone - it just updates the report in the thread.  You can have the bot post an update in the channel, though:
