@@ -124,11 +124,11 @@ controller.spawn({
 			// Get a weekly user report
 			botLib.userReport(controller, bot);
 
-			// Respond to all other direct messages
-			botLib.unhandledDM(controller, bot);
-
 			// show link to most recent standup thread
 			botLib.showLatestStandup(controller, bot);
+
+			// Respond to all other direct messages - MAKE SURE THIS IS ALWAYS REGISTERED LAST
+			botLib.unhandledDM(controller, bot);
 
 			log.verbose('All bot functions initialized');
 
