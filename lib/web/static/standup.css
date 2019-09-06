@@ -28,14 +28,15 @@ a.doc-link {
   margin: 5px;
 }
 
+pre {
+	padding: 5px;
+	border: 1px dashed #00a6d2;
+}
+
 pre, code {
-  padding: 5px;
   background: #e1f3f8;
-  border: 1px dashed #00a6d2;
 }
 
 pre > code {
-  padding: 0;
   background: transparent;
-  border: 0;
 }

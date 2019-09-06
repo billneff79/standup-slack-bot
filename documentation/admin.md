@@ -74,11 +74,6 @@ or
 
 `/{{slash_command}} disable updates`
 
-
-
-slash commands also work:
-`/{{slash_command}} enable updates`
-
 ## Deleting a standup
 
 To remove a standup and stop reporting on it, in the channel, say:
