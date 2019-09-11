@@ -18,8 +18,8 @@ Feature: Send standup to the bot
       | visibility | status   | response |
       | public     | does     | Thanks   |
       | public     | does not | channel doesn't have any standups set |
-      | private    | does     | only work with public channels |
-      | private    | does not | only work with public channels |
+      | private    | does     | Thanks |
+      | private    | does not | channel doesn't have any standups set |
 
   Scenario: I edit a standup message
     Given the bot is running

@@ -1,134 +1,116 @@
-
+const { After, Before, Given, When } = require('cucumber');
 let sinon = require('sinon');
 let botLib = require('../../lib/bot');
 let models = require('../../models');
 let common = require('./common');
+let helpers = require('../../lib/helpers');
 
-module.exports = function() {
-	let _message = { };
-	let _findOneChannelStub;
-	let _findOrCreateStub;
-	let _findOneStandupStub;
-	let _getUserStub;
-	let _updateStandupStub;
-	let _updateChannelStub;
+let sandbox;
+let channel, channelMention;
 
-	this.Given(/I want to send a standup for a ([^>]+) channel/, (visibility) => {
-		if (visibility === 'public') {
-			_message.channel = 'CSomethingSaySomething';
-		}
-		else {
-			_message.channel = 'PnutButterJellyTime';
-		}
+Before(() => {
+	channel = channelMention = undefined;
+	sandbox = sinon.createSandbox();
+});
+
+Given(/I want to send a standup for a ([^>]+) channel/, (visibility) => {
+	if (visibility === 'public') {
+		channel = 'CSomethingSaySomething';
+		channelMention = `<#${channel}|name-${channel}>`;
+	}
+	else {
+		channel = 'PnutButterJellyTime';
+		channelMention = `#PnutButterJellyTime`;
+	}
+});
+
+Given(/^the channel (.+) have a standup/, (status) => {
+	let hasStandup = status === 'does';
+	sandbox.stub(models.Channel, 'findOne').resolves(hasStandup ? {
+		time: '130', name: 'CSomethingSaySomething', audience: null, latestReport: '123467.01'
+	} : undefined);
+	sandbox.stub(models.Standup, 'findOrCreate').resolves({ });
+	sandbox.stub(models.Standup, 'findOne').resolves(hasStandup ? {
+		user: 'U00000000',
+		userRealName: 'Bob the Tester',
+		yesterday: 'In the past',
+		today: 'Now',
+		blockers: 'Barricades',
+		goal: 'Accomplishments-to-be'
+	} : undefined);
+});
+
+When(/^I DM the bot with standup$/, (standupText, done) => {
+	botLib.getUserStandupInfo(common.botController, common.rtmBot);
+
+	sandbox.stub(models.Standup, 'update').resolves({ });
+	let message = {
+		user: 'U7654321',
+		text: `standup ${channelMention}\n${standupText}`,
+		channel: 'Dchannel'
+	};
+
+	sandbox.stub(helpers, 'getChannelInfoFromMessage').callsFake((bot, message) => {
+		let name = `name-${message.channel}`;
+		return Promise.resolve({ id: message.channel, mention: channelMention, name });
 	});
 
-	this.Given(/^the channel (.+) have a standup/, (status) => {
-		if (status === 'does') {
-			_findOneChannelStub = sinon.stub(models.Channel, 'findOne').resolves({
-				time: '130', name: 'CSomethingSaySomething', audience: null, latestReport: '123467.01'
-			});
-			_findOrCreateStub = sinon.stub(models.Standup, 'findOrCreate').resolves({ });
-			_findOneStandupStub = sinon.stub(models.Standup, 'findOne').resolves({
-				user: 'U00000000',
-				userRealName: 'Bob the Tester',
-				yesterday: 'In the past',
-				today: 'Now',
-				blockers: 'Barricades',
-				goal: 'Accomplishments-to-be'
-			});
-		}
+	common.botRepliesToHearing(message, done, 'direct_message');
+});
+
+When(/^I DM the bot with (valid|invalid) standup edit$/, (valid, done) => {
+	botLib.getUserStandupInfo(common.botController, common.rtmBot);
+
+	let message = {
+		user: 'U7654321',
+		text: `standup ${channelMention} edit today`,
+		channel: 'Dchannel'
+	};
+
+	sandbox.stub(helpers, 'getChannelInfoFromMessage').callsFake((bot, message) => {
+		let name = `name-${message.channel}`;
+		return Promise.resolve({ id: message.channel, mention: channelMention, name });
 	});
 
-	this.When(/^I DM the bot with standup$/, (message, done) => {
-		botLib.getUserStandupInfo(common.botController);
+	if (valid === 'valid') {
+		common.botStartsConvoWith(message, done, 'direct_message');
+	}
+	else {
+		common.botRepliesToHearing(message, done, 'direct_message');
+	}
+});
 
-		// _getUserStub = sinon.stub(helpers, 'getUser').resolves({ real_name: 'Bob the Tester' });
-		_updateStandupStub = sinon.stub(models.Standup, 'update').resolves({ });
-
-		_message.user = 'U7654321';
-		_message.match = [
-			'<#' + _message.channel + '> ' + message, // whole message
-			'', // optionally the word 'standup'
-			_message.channel,
-			'', // iOS channel tag has '|channelName' on the end
-			message
-		];
-
-		common.botRepliesToHearing(_message, done);
+When('I edit a DM to the bot to say', (message, done) => {
+	botLib.getUserStandupInfo(common.botController, common.rtmBot);
+	sandbox.stub(models.Channel, 'update').resolves({ });
+	sandbox.stub(helpers, 'getChannelInfoFromMessage').callsFake((bot, message) => {
+		let name = `name-${message.channel}`;
+		return Promise.resolve({ id: message.channel, mention: channelMention, name });
 	});
 
-	this.When(/^I DM the bot with (valid|invalid) standup edit$/, (valid, done) => {
-		botLib.getUserStandupInfo(common.botController);
-
-		_message.user = 'U7654321';
-		_message.match = [
-			'<#' + _message.channel + '> edit today',
-			'', // optionally the word 'standup'
-			_message.channel,
-			'', // iOS channel tag has '|channelName' on the end
-			'edit today'
-		];
-
-		if (valid === 'valid') {
-			common.botStartsConvoWith(_message, common.botController.hears, done);
-		}
-		else {
-			common.botRepliesToHearing(_message, done);
-		}
-	});
-
-	this.When('I edit a DM to the bot to say', (message, done) => {
-		botLib.getUserStandupInfo(common.botController);
-		// _getUserStub = sinon.stub(helpers, 'getUser').resolves({ real_name: 'Bob the Tester' });
-		_updateChannelStub = sinon.stub(models.Channel, 'update').resolves({ });
-
-		common.botRepliesToHearing({
+	common.botRepliesToHearing({
+		type: 'message_changed',
+		message: {
 			type: 'message',
-			message: {
-				type: 'message',
-				user: 'U00000000',
-				text: '<#' + _message.channel + '> ' + message,
-				edited: { user: 'U00000000', ts: '1234567890.000000' },
-				ts: '1234567890.000000'
-			},
-			subtype: 'message_changed',
-			hidden: true,
-			channel: 'Dchannel',
-			previous_message: {
-				type: 'message',
-				user: 'U00000000',
-				text: 'Not really relevant...',
-				ts: '1234567890.000000'
-			},
-			event_ts: '1234567890.000000',
+			user: 'U7654321',
+			text: `${channelMention} ${message}`,
+			edited: { user: 'U7654321', ts: '1234567890.000000' },
 			ts: '1234567890.000000'
-		}, common.botController.on, done);
-	});
+		},
+		subtype: 'message_changed',
+		hidden: true,
+		channel: 'Dchannel',
+		previous_message: {
+			type: 'message',
+			user: 'U7654321',
+			text: 'Not really relevant...',
+			ts: '1234567890.000000'
+		},
+		event_ts: '1234567890.000000',
+		ts: '1234567890.000000'
+	}, done);
+});
 
-	this.After(() => {
-		if (_findOneChannelStub) {
-			_findOneChannelStub.restore();
-			_findOneChannelStub = null;
-		}
-		if (_findOrCreateStub) {
-			_findOrCreateStub.restore();
-			_findOrCreateStub = null;
-		}
-		if (_findOneStandupStub) {
-			_findOneStandupStub.restore();
-			_findOneStandupStub = null;
-		}
-		if (_updateStandupStub) {
-			_updateStandupStub.restore();
-			_updateStandupStub = null;
-		}
-		if (_getUserStub) {
-			_getUserStub.restore();
-			_getUserStub = null;
-		}
-		if (_updateChannelStub) {
-			_updateChannelStub.restore();
-			_updateChannelStub = null;
-		}
-	});
-};
+After(() => {
+	sandbox.restore();
+});

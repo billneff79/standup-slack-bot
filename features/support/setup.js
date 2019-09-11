@@ -1,8 +1,3 @@
-
-
-// Add .resolves to sinon stubs
-require('sinon-as-promised');
-
 // Mock sequelize
 let path = require('path');
 let mockRequire = require('mock-require');

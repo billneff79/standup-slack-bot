@@ -1,5 +1,5 @@
-Feature: Create standup meetings on a recurring basis
 
+Feature: Create standup meetings on a recurring basis
   Scenario Outline: I try to create a standup
     Given the bot is running
     And I am in a room with the bot
@@ -15,8 +15,9 @@ Feature: Create standup meetings on a recurring basis
     Given the bot is running
     And I am in a private room with the bot
     When I say "@bot create standup at <time>"
-    Then the bot should respond "I can only work with public channels"
+    Then the bot should respond "<response-start>"
 
-    Examples:
-      | time |
-      | 0830 |
+		Examples:
+      | time | response-start                                |
+      | 0830 | Standup scheduled                             |
+			| 130  | :x: Sorry, I couldn't understand that message |

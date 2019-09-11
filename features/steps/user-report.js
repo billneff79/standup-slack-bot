@@ -1,23 +1,16 @@
-
+const { When } = require('cucumber');
 let botLib = require('../../lib/bot');
 let common = require('./common');
 
-module.exports = function () {
-	let _message = { };
 
-	this.When(/I say "@bot ((report) (.*))"/, (message, triggerWord, rest, done) => {
-		botLib.userReport(common.botController, common.rtmBot);
+When(/I say "@bot (report .*)"/, (messageText, done) => {
+	botLib.userReport(common.botController, common.rtmBot);
 
-		_message.type = 'message';
-		_message.text = message;
-		_message.channel = _message.channel || 'CSomethingSaySomething';
-		_message.user = _message.user || 'Somebody';
-		_message.match = [
-			message,
-			triggerWord,
-			rest
-		];
+	let message ={
+		text: messageText,
+		channel: 'CSomethingSaySomething',
+		user: 'U1234'
+	};
 
-		common.botRepliesToHearing(_message, done);
-	});
-};
+	common.botRepliesToHearing(message, done);
+});

@@ -1,38 +1,31 @@
-
-
+const { After, When, Then } = require('cucumber');
 let sinon = require('sinon');
 // var botLib = require('../../lib/bot');
 let common = require('./common');
 let models = require('../../models');
-let time = require('./time');
 let reminderRunner = require('../../lib/bot/getReminderRunner');
 
-module.exports = function() {
-	let _findAllChannelsStub;
-	let _bot;
+let _findAllChannelsStub;
+let _bot;
 
-	this.When('the reminder time comes', () => {
-		_findAllChannelsStub = sinon.stub(models.Channel, 'findAll').resolves([{
-			name: 'Test Channel',
-			audience: null
-		}]);
+When('the reminder time comes', () => {
+	_findAllChannelsStub = sinon.stub(models.Channel, 'findAll').resolves([{
+		name: 'Test Channel',
+		audience: null
+	}]);
 
-		// Also stub the bot
-		_bot = { };
-		_bot.say = sinon.spy();
+	// Also stub the bot
+	_bot = { };
+	_bot.say = sinon.spy();
 
-		// Kick off the reporter
-		reminderRunner(_bot)();
+	// Kick off the reporter
+	reminderRunner(_bot)();
+});
 
-		// If fake timers have been setup, reset them now.
-		// Otherwise, setTimeout won't behave correctly (i.e.,
-		// at all).
-		time.resetTimers();
-	});
-
-	this.Then('the bot should send a reminder', (done) => {
-		// Wait until the findAll and say stubs have been called
-		common.wait(() => _findAllChannelsStub.called && _bot.say.called, () => {
+Then('the bot should send a reminder', (done) => {
+	// Wait until the findAll and say stubs have been called
+	common.wait(() => _findAllChannelsStub.called && _bot.say.called)
+		.then(() => {
 			// If the bot sent text, it tried to
 			// report correctly.
 			if (_bot.say.args[0][0].text) {
@@ -41,13 +34,13 @@ module.exports = function() {
 			else {
 				done(new Error('Expected bot to report with text'));
 			}
-		});
-	});
+		})
+		.catch(() => done('Timed out waiting for findAllChannels and bot.say to be called'));
+});
 
-	// Teardown stubs
-	this.After(() => {
-		if (_findAllChannelsStub) {
-			_findAllChannelsStub.restore();
-		}
-	});
-};
+// Teardown stubs
+After(() => {
+	if (_findAllChannelsStub) {
+		_findAllChannelsStub.restore();
+	}
+});

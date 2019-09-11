@@ -1,58 +1,62 @@
-
+const { Before, After, When } = require('cucumber');
 let sinon = require('sinon');
 let models = require('../../models');
 let botLib = require('../../lib/bot');
 let common = require('./common');
+let helpers = require('../../lib/helpers');
 
-module.exports = function() {
-	let _message = { };
+let sandbox;
 
-	let _findAllStandupsStub;
-	let _findOneChannelStub;
+Before(() => {
+	sandbox = sinon.createSandbox();
+});
 
-	function clearStubs() {
-		if (_findOneChannelStub) {
-			_findOneChannelStub.restore();
-			_findOneChannelStub = null;
-		}
-		if (_findAllStandupsStub) {
-			_findAllStandupsStub.restore();
-			_findAllStandupsStub = null;
-		}
-	}
+function stubGetChannelInfoFromMessage() {
+	if (helpers.getChannelInfoFromMessage.isSinonProxy) return;
+	sandbox.stub(helpers, 'getChannelInfoFromMessage').callsFake((bot, message) => {
+		let name = `name-${message.channel}`;
+		return Promise.resolve({ id: message.channel, mention: `<#${message.channel}|${name}>`, name });
+	});
+}
 
-	this.When('I am already being interviewed for another channel', (done) => {
+When('I am already being interviewed for another channel', (done) => {
+	botLib.startInterview(common.botController, common.rtmBot);
+
+	const message = {
+		user: 'U7654321',
+		text: '@bot interview me',
+		channel: 'COtherChannel'
+	};
+
+	stubGetChannelInfoFromMessage();
+	sandbox.stub(models.Standup, 'findAll').resolves([ ]);
+	sandbox.stub(models.Channel, 'findOne').resolves({ time: '1230', name: message.channel, audience: null });
+
+	common.botStartsConvoWith(message, restoreModelStubsAndCallDone(done));
+});
+
+When(/I say "@bot\b.*(\binterview\b.*)"/,
+	(interviewText, done) => {
 		botLib.startInterview(common.botController, common.rtmBot);
 
-		const message = {
-			user: 'U7654321',
-			type: 'message',
-			text: '@bot interview me',
-			channel: 'COtherChannel'
-		};
+		let message = { };
 
-		_findAllStandupsStub = sinon.stub(models.Standup, 'findAll').resolves([ ]);
-		_findOneChannelStub = sinon.stub(models.Channel, 'findOne').resolves({ time: '1230', name: message.channel, audience: null });
+		message.user = 'U7654321';
+		message.text = interviewText;
+		message.channel ='CSomethingSaySomething';
 
-		common.botStartsConvoWith(message, common.botController.hears, () => {
-			clearStubs();
-			done();
-		});
+		stubGetChannelInfoFromMessage();
+		sandbox.stub(models.Standup, 'findAll').resolves([ ]);
+		sandbox.stub(models.Channel, 'findOne').resolves({ time: '1230', name: message.channel, audience: null });
+		common.botStartsConvoWith(message, restoreModelStubsAndCallDone(done));
 	});
 
-	this.When(/I say "(@bot\b.*\binterview\b.*)"/,
-		(message, done) => {
-			botLib.startInterview(common.botController, common.rtmBot);
+After(() => {
+	sandbox.restore();
+});
 
-			_message.user = 'U7654321';
-			_message.type = 'message';
-			_message.text = message;
-			_message.channel = _message.channel || 'CSomethingSaySomething';
-
-			_findAllStandupsStub = sinon.stub(models.Standup, 'findAll').resolves([ ]);
-			_findOneChannelStub = sinon.stub(models.Channel, 'findOne').resolves({ time: '1230', name: _message.channel, audience: null });
-			common.botStartsConvoWith(_message, common.botController.hears, done);
-		});
-
-	this.After(clearStubs);
+const restoreModelStubsAndCallDone = (done) => () => {
+	models.Standup.findAll.restore();
+	models.Channel.findOne.restore();
+	done();
 };

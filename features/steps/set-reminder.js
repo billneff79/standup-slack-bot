@@ -1,28 +1,16 @@
-
-// var sinon = require('sinon');
+const { When } = require('cucumber');
 let botLib = require('../../lib/bot');
 let common = require('./common');
-// var models = require('../../models');
 
-module.exports = function() {
-	let _message = { };
-	// var _findAllChannelsStub;
-	// var _bot;
 
-	this.When(/I say "@bot ((reminder) (.*))"/,
-		(message, triggerWord, rest, done) => {
-			botLib.setReminder(common.botController, common.rtmBot);
+When(/I say "@bot (reminder .*)"/,
+	(messageText, done) => {
+		botLib.setReminder(common.botController, common.rtmBot);
 
-			_message.type = 'message';
-			_message.text = message;
-			_message.channel = _message.channel || 'CSomethingSaySomething';
-			_message.match = [
-				message,
-				triggerWord,
-				rest
-			];
+		let message = {
+			text: messageText,
+			channel: 'CSomethingSaySomething'
+		};
 
-			common.botRepliesToHearing(_message, done);
-		});
-
-};
+		common.botRepliesToHearing(message, done);
+	});
