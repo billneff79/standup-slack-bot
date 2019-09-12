@@ -1,63 +1,33 @@
-const { After, Before, Given, When } = require('cucumber');
-let sinon = require('sinon');
-let botLib = require('../../lib/bot');
-let common = require('./common');
+const { Given, When } = require('cucumber');
 let models = require('../../models');
+let botLib = require('../../lib/bot');
 let helpers = require('../../lib/helpers');
 
-let now;
-let _botId = '';
-
-let sandbox;
-
-Before(() => {
-	sandbox = sinon.createSandbox();
-});
-
-Given(/it (.*) before the standup report has run for the day/, (onTime) => {
-	if (onTime === 'is') {
-		now = '5:30 am EST';
-	}
-	else {
-		now = '5:30 pm EST';
-	}
-	sandbox.stub(helpers.time, 'getDisplayFormat')
+Given(/it (.*) before the standup report has run for the day/, function (onTime) {
+	let now = `5:30 ${onTime === 'is' ? 'am' : 'pm'} EST`;
+	this.sandbox.stub(helpers.time, 'getDisplayFormat')
 		.onFirstCall().returns(now)
 		.onSecondCall().returns('12:30 pm EST');
 });
 
-Given(/^the bot ID is 'U(\d+)'$/, (botId) => {
-	_botId = botId;
+Given(/^the bot ID is '(U\d+)'$/, (botId) => {
+	this.botId = botId;
 });
 
-When("I add an emoji reaction to the bot's reminder message", (done) => {
-	botLib.startDmEmoji(common.botController, 'U'+_botId);
+When("I add an emoji reaction to the bot's reminder message", function (done) {
+	botLib.startDmEmoji(this.botController, this.botId);
 
-	let message = {
+	Object.assign(this.message, {
 		type: 'reaction_added',
-		item: { channel: 'CSomethingSaySomething' },
-		item_user: 'U'+_botId,
-		user: 'U7654321',
-		reaction: 'thumbsup',
-		channel: 'CSomethingSaySomething'
-	};
-
-	sandbox.stub(models.Standup, 'findAll').resolves([ ]);
-
-	sandbox.stub(helpers, 'getChannelInfoFromMessage').callsFake((bot, message) => {
-		let name = `name-${message.item.channel}`;
-		let channelMention = `<#${message.item.channel}|${name}>`;
-		return Promise.resolve({ id: message.item.channel, mention: channelMention, name });
+		item: { channel: this.message.channel },
+		item_user: this.botId,
+		user: this.USER_ID,
+		reaction: 'thumbsup'
 	});
 
-
 	//if a standup is scheduled, a new conversation will start, otherwise a private response will come
-	models.Channel.findOne({ channel: message.channel })
+	models.Channel.findOne({ where: { channel: this.message.channel } })
 		.then(channel => {
-			channel ? common.botStartsConvoWith(message, done, 'reaction_added') : common.botReceivesMessage(message, 'reaction_added', done);
+			channel ? this.botRepliesWith(this.message, done, 'reaction_added') : this.botReceivesMessage(this.message, 'reaction_added', done);
 		});
-});
-
-After(() => {
-	sandbox.restore();
 });

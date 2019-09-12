@@ -1,10 +1,9 @@
 Feature: Find out when the next standup is
 
-  Scenario Outline: I ask for the standup time in a channel with a standup
+	Scenario Outline: I ask for the standup time in a channel with a standup
     Given the bot is running
-    And I am in a room with the bot
-    And the standup is scheduled for <scheduled-time>
-    And the standup is scheduled on <days-of-the-week>
+    And I am in a public room with the bot
+    And the standup is scheduled for <scheduled-time> on <days-of-the-week>
     When I say "@bot when"
     Then the bot should respond "There's a standup scheduled for <scheduled-time> E[SD]T on <days>"
 
@@ -18,7 +17,7 @@ Feature: Find out when the next standup is
 
   Scenario: I ask for the standup time in a channel without a standup
     Given the bot is running
-    And I am in a room with the bot
+    And I am in a public room with the bot
     And no standup is scheduled
     When I say "@bot when"
     Then the bot should respond "There's no standup scheduled yet."

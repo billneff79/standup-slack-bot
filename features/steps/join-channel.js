@@ -1,17 +1,14 @@
 const { Given, When } = require('cucumber');
 let botLib = require('../../lib/bot');
-let common = require('./common');
 
-Given(/^the bot is named "([^"]+)"$/, (botName) => {
+Given(/^the bot is named "([^"]+)"$/, function (botName) {
 	this.botName = botName;
 });
 
-When('the bot joins a channel', (done) => {
-	botLib.joinChannel(common.botController, this.botName);
+When('the bot joins a channel', function (done) {
+	botLib.joinChannel(this.botController, this.botName);
 
-	let message = {
-		channel: 'CSomethingSaySomething'
-	};
+	(this.message || (this.message = {})).channel ='CRoom';
 
-	common.botRepliesToHearing(message, done, 'bot_channel_join');
+	this.botRepliesToHearing(this.message, done, 'bot_channel_join');
 });

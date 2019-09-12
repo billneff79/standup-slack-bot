@@ -1,15 +1,22 @@
 const { When } = require('cucumber');
 let botLib = require('../../lib/bot');
-let common = require('./common');
 
-const doIt = (type) => (text, done) => {
-	botLib.giveHelp(common.botController, common.rtmBot);
-	common.botWhispersToHearing({ text, channel: 'CSomethingSaySomething' }, done);
-};
-
-When(/I say "@bot (help)"/, doIt('direct_mention'));
-When(/I slash command "(help)"/, (text, done) => {
-	botLib.giveHelp(common.botController, common.rtmBot);
-	common.webhookBotPrivateReplyToHearing({ text, channel: 'CSomethingSaySomething' }, done,'slash_command');
+When(/I say "@bot (help)"/, function(text, done) {
+	botLib.giveHelp(this.botController, this.rtmBot);
+	this.message.text = text;
+	this.botRepliesToHearing(this.message, done);
 });
-When(/I DM the bot with "(help)"/, doIt('direct_message'));
+
+When(/I slash command "(help)"/, function (text, done) {
+	botLib.giveHelp(this.botController, this.rtmBot);
+	this.webhookBotRepliesToHearing({ text, channel: this.channel.id }, done,'slash_command');
+});
+
+When(/I DM the bot with "(help)"/, function(text, done) {
+	botLib.giveHelp(this.botController, this.rtmBot);
+
+	this.message.text = text;
+	this.message.type='direct_message';
+
+	this.botRepliesToHearing(this.message, done);
+});

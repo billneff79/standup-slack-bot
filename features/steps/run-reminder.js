@@ -1,46 +1,26 @@
-const { After, When, Then } = require('cucumber');
-let sinon = require('sinon');
+const { When, Then } = require('cucumber');
 // var botLib = require('../../lib/bot');
-let common = require('./common');
 let models = require('../../models');
+let helpers = require('../../lib/helpers');
 let reminderRunner = require('../../lib/bot/getReminderRunner');
 
-let _findAllChannelsStub;
-let _bot;
 
-When('the reminder time comes', () => {
-	_findAllChannelsStub = sinon.stub(models.Channel, 'findAll').resolves([{
-		name: 'Test Channel',
-		audience: null
-	}]);
-
-	// Also stub the bot
-	_bot = { };
-	_bot.say = sinon.spy();
+When('the reminder time comes', function() {
+	this.existingChannels.push({
+		name: this.PUBLIC_CHANNEL.id,
+		reminderTime: helpers.time.getScheduleFormat(),
+		[helpers.time.getScheduleDay()]: true
+	});
 
 	// Kick off the reporter
-	reminderRunner(_bot)();
+	reminderRunner(this.rtmBot)();
 });
 
-Then('the bot should send a reminder', (done) => {
+Then('the bot should send a reminder', function(done) {
 	// Wait until the findAll and say stubs have been called
-	common.wait(() => _findAllChannelsStub.called && _bot.say.called)
+	this.wait(() => models.Channel.findAll.called && this.rtmBot.say.called)
 		.then(() => {
-			// If the bot sent text, it tried to
-			// report correctly.
-			if (_bot.say.args[0][0].text) {
-				done();
-			}
-			else {
-				done(new Error('Expected bot to report with text'));
-			}
+			done(this.rtmBot.say.args[0][0].text ? undefined : 'Expected bot to report with text');
 		})
 		.catch(() => done('Timed out waiting for findAllChannels and bot.say to be called'));
-});
-
-// Teardown stubs
-After(() => {
-	if (_findAllChannelsStub) {
-		_findAllChannelsStub.restore();
-	}
 });

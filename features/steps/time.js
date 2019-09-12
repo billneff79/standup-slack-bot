@@ -1,5 +1,4 @@
-const { After, Given } = require('cucumber');
-let sinon = require('sinon');
+const { Given } = require('cucumber');
 let fedHolidays = require('@18f/us-federal-holidays');
 
 let fakeTimers = null;
@@ -8,12 +7,10 @@ let fakeTimers = null;
 // setup already.  Set the internal time to now.
 // (Sinon defaults to the epoch).
 function setupFakeTimers(date) {
-	if (!fakeTimers) {
-		fakeTimers = sinon.useFakeTimers(date || new Date());
-	}
+	if (!fakeTimers) fakeTimers = this.sandbox.useFakeTimers(date || new Date());
 }
 
-Given('it is a weekday', () => {
+Given('it is a weekday', function () {
 	// Go forwards one day at a time until we land
 	// on a day that is neither Sunday (0) or
 	// Saturday (6).
@@ -21,50 +18,36 @@ Given('it is a weekday', () => {
 	while (date.getDay() === 0 || date.getDay() === 6) {
 		date = new Date(date.getTime()+86400000);
 	}
-	setupFakeTimers(date);
+	setupFakeTimers.call(this, date);
 
 });
 
-Given('it is a weekend', () => {
+Given('it is a weekend', function () {
 	// Go forward a day at a time until we land
 	// on Saturday or Sunday.
 	let date = new Date();
 	while (date.getDay() !== 0 && date.getDay() !== 6) {
 		date = new Date(date.getTime()+86400000);
 	}
-	setupFakeTimers(date);
+	setupFakeTimers.call(this, date);
 });
 
-Given('it is not a holiday', () => {
+Given('it is not a holiday', function () {
 	// Go backwards a day at a time until we land
 	// on a weekday that isn't a holiday.
 	let date = new Date();
 	while (fedHolidays.isAHoliday(date) || date.getDay() === 0 || date.getDay() === 6) {
 		date = new Date(date.getTime()+86400000);
 	}
-	setupFakeTimers(date);
+	setupFakeTimers.call(this, date);
 });
 
-Given('it is a holiday', () => {
+Given('it is a holiday', function () {
 	// Go backwards a day at a time until we land
 	// on a weekday that is a holiday.
 	let date = new Date();
 	while (!fedHolidays.isAHoliday(date) || date.getDay() === 0 || date.getDay() === 6) {
 		date = new Date(date.getTime()+86400000);
 	}
-	setupFakeTimers(date);
+	setupFakeTimers.call(this, date);
 });
-
-// Reset fake timers
-After(() => {
-	module.exports.restoreTimers();
-});
-
-// Provide a mechanism for manually resetting the
-// timers if needed.
-module.exports.restoreTimers = function() {
-	if (fakeTimers) {
-		fakeTimers.restore();
-		fakeTimers = null;
-	}
-};

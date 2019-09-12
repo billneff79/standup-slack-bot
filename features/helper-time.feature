@@ -3,7 +3,7 @@ Feature: Time Helper, parsing a string
   I want the time helper to convert a time to a formatted string
 
   Scenario Outline: Parsing a string to a time (negative examples)
-    Given the string <time_string>
+    Given the time string <time_string>
       When I try to parse it
       Then the time should not parse
 
@@ -15,7 +15,7 @@ Feature: Time Helper, parsing a string
       | 830 am      | should not |
 
   Scenario Outline: Parsing a string to a time (positive examples)
-    Given the string <time_string>
+    Given the time string <time_string>
       When I try to parse it
       Then the time should parse
       And the parsed time and days should be <expected_time_days>

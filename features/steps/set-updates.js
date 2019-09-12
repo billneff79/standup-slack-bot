@@ -1,17 +1,8 @@
 const { When } = require('cucumber');
 let botLib = require('../../lib/bot');
-let common = require('./common');
 
-let _message = { };
-
-When(/I say "@bot (.*(?:enable|disable) updates)"/,
-	(messageText, done) => {
-		botLib.setInChannelUpdate(common.botController, common.rtmBot);
-
-		let message = {
-			text: messageText,
-			channel: 'CSomethingSaySomething'
-		};
-
-		common.botRepliesToHearing(message, done);
-	});
+When(/I say "@bot (.*(?:enable|disable) updates)"/, function (messageText, done) {
+	botLib.setInChannelUpdate(this.botController, this.rtmBot);
+	this.message.text = messageText;
+	this.botRepliesToHearing(this.message, done);
+});

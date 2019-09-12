@@ -1,20 +1,11 @@
-const { After, When } = require('cucumber');
-let sinon = require('sinon');
+const { When } = require('cucumber');
 let models = require('../../models');
 let botLib = require('../../lib/bot');
-let common = require('./common');
 
 
-When(/I say "@bot (remove standup)"/,
-	(messageText, done) => {
-		botLib.removeStandup(common.botController, common.rtmBot);
-		let message = { text: messageText };
-		message.channel = 'CSomethingSaySomething';
-
-		sinon.stub(models.Channel, 'destroy').resolves({ });
-		common.botRepliesToHearing(message, done);
-	});
-
-After(() => {
-	models.Channel.destroy.restore && models.Channel.destroy.restore();
+When(/I say "@bot (remove standup)"/, function (messageText, done) {
+	botLib.removeStandup(this.botController, this.rtmBot);
+	this.message.text = messageText;
+	this.sandbox.stub(models.Channel, 'destroy').resolves({ });
+	this.botRepliesToHearing(this.message, done);
 });

@@ -1,16 +1,12 @@
 const { When } = require('cucumber');
 let botLib = require('../../lib/bot');
-let common = require('./common');
 
 
-When(/I say "@bot (report .*)"/, (messageText, done) => {
-	botLib.userReport(common.botController, common.rtmBot);
+When(/I say "@bot (report .*)"/, function(messageText, done) {
+	botLib.userReport(this.botController, this.rtmBot);
 
-	let message ={
-		text: messageText,
-		channel: 'CSomethingSaySomething',
-		user: 'U1234'
-	};
+	this.message.text = messageText;
+	this.message.user = 'U1234';
 
-	common.botRepliesToHearing(message, done);
+	this.botRepliesToHearing(this.message, done);
 });

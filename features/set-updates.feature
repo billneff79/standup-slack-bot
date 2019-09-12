@@ -2,7 +2,7 @@ Feature: Set in-channel report updates
 
   Scenario Outline: I try to toggle in-channel report updates
     Given the bot is running
-    And I am in a room with the bot
+    And I am in a public room with the bot
     And the standup is scheduled for <utc-time>
     When I say "@bot <toggle> updates"
     Then the bot should respond "Okay, I <will-or-wont> update the channel with late reports"

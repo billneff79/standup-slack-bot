@@ -2,7 +2,7 @@ Feature: Remove scheduled standup meetings
 
   Scenario Outline: I try to remove a standup
     Given the bot is running
-    And I am in a room with the bot
+    And I am in a public room with the bot
     And the channel <status> have a standup
     When I say "@bot remove standup"
     Then the bot should respond "<response>"
